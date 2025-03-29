@@ -1,4 +1,5 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+// update-portfolio.dto.ts
+import { IsOptional, IsString, IsArray } from 'class-validator';
 
 export class UpdatePortfolioDto {
   @IsOptional()
@@ -24,5 +25,5 @@ export class UpdatePortfolioDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  galleryImages?: string[];
+  gallery?: string[];
 }

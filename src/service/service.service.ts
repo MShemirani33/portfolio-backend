@@ -1,4 +1,3 @@
-import { Service } from './../../node_modules/.prisma/client/index.d';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateServiceDto } from './create-service.dto';
