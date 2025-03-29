@@ -15,6 +15,15 @@ export class PortfolioService {
         thumbnail: dto.thumbnail,
         shortDesc: dto.shortDesc,
         content: dto.content,
+        gallery: {
+          create:
+            dto.galleryImages?.map((url) => ({
+              imageUrl: url,
+            })) || [],
+        },
+      },
+      include: {
+        gallery: true,
       },
     });
   }

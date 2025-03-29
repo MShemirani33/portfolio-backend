@@ -7,9 +7,18 @@ import { ServiceModule } from './service/service.module';
 import { HomePageContentModule } from './home-page-content/home-page-content.module';
 import { ContactModule } from './contact/contact.module';
 import { AuthModule } from './auth/auth.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
-  imports: [PortfolioModule, PrismaModule, ServiceModule, HomePageContentModule, ContactModule, AuthModule],
+  imports: [
+    PortfolioModule,
+    PrismaModule,
+    ServiceModule,
+    HomePageContentModule,
+    ContactModule,
+    AuthModule,
+    UploadsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

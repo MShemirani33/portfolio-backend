@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class CreatePortfolioDto {
   @IsString()
@@ -10,9 +10,15 @@ export class CreatePortfolioDto {
   @IsString()
   thumbnail: string;
 
+  @IsOptional()
   @IsString()
-  shortDesc: string;
+  shortDesc?: string;
 
   @IsString()
   content: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  galleryImages?: string[]; 
 }

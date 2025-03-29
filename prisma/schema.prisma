@@ -15,13 +15,21 @@ datasource db {
 
 
 model Portfolio {
-  id          Int      @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   title       String
   slug        String   @unique
   thumbnail   String
   shortDesc   String? 
   content     String
   createdAt   DateTime @default(now())
+  gallery     GalleryImage[]
+}
+
+model GalleryImage {
+  id           Int        @id @default(autoincrement())
+  imageUrl     String
+  portfolio    Portfolio  @relation(fields: [portfolioId], references: [id])
+  portfolioId  Int
 }
 
 model Service {
@@ -44,11 +52,16 @@ model ContactMessage {
   createdAt   DateTime @default(now())
 }
 
+enum Role {
+  admin
+  superadmin
+}
+
 
 model Admin {
   id         Int      @id @default(autoincrement())
   email      String   @unique
   password   String
-  role       String   @default("admin") 
+  role       Role     @default(admin)
   createdAt  DateTime @default(now())
 }
