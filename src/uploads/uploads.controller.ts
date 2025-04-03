@@ -20,7 +20,7 @@ export class UploadsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Post('image')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file || !file.buffer) {
