@@ -15,7 +15,7 @@ model Portfolio {
   content   String
   createdAt DateTime       @default(now())
   shortDesc String?
-  gallery   GalleryImage[]
+  gallery   GalleryImage[] // 👈 گالری به‌صورت ارتباطی
 }
 
 model GalleryImage {
@@ -24,7 +24,6 @@ model GalleryImage {
   portfolioId Int
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
 }
-
 model Service {
   id    Int    @id @default(autoincrement())
   title String
