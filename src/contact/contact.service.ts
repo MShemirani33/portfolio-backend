@@ -21,4 +21,19 @@ export class ContactService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async findOne(id: number) {
+    return this.prisma.contactMessage.update({
+      where: { id },
+      data: { isRead: true },
+    });
+  }
+
+  async delete(id: number) {
+    return this.prisma.contactMessage.delete({ where: { id } });
+  }
+
+  async countUnread() {
+    return this.prisma.contactMessage.count({ where: { isRead: false } });
+  }
 }
