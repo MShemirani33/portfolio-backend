@@ -27,4 +27,13 @@ export class GalleryController {
   async getByPortfolio(@Param('portfolioId') portfolioId: string) {
     return this.galleryService.getGalleryByPortfolio(+portfolioId);
   }
+
+  @Get(':portfolioId/:imageId')
+  @ApiOperation({ summary: 'دریافت یک عکس از گالری یک پروژه خاص' })
+  async getImageFromPortfolio(
+    @Param('portfolioId') portfolioId: string,
+    @Param('imageId') imageId: string,
+  ) {
+    return this.galleryService.getImageFromPortfolio(+portfolioId, +imageId);
+  }
 }

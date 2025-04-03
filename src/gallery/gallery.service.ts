@@ -37,4 +37,16 @@ export class GalleryService {
       where: { portfolioId },
     });
   }
+
+  async getImageFromPortfolio(portfolioId: number, imageId: number) {
+    const image = await this.prisma.galleryImage.findUnique({
+      where: { id: imageId },
+    });
+
+    if (!image || image.portfolioId !== portfolioId) {
+      throw new NotFoundException('تصویر یافت نشد یا متعلق به این پروژه نیست');
+    }
+
+    return image;
+  }
 }
