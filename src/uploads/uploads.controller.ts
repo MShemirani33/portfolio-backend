@@ -13,36 +13,36 @@ import * as path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Readable } from 'stream';
-import { AuthGuard } from '@nestjs/passport';
-
-interface UploadResult {
-  message: string;
-  filePath: string;
-  hash: string;
-  duplicate: boolean;
-  success: boolean;
-}
+// import { AuthGuard } from '@nestjs/passport';
 
 @Controller('upload')
 export class UploadsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Post('images')
-  @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FilesInterceptor('files', 10, { storage: multer.memoryStorage() }))
-  async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]): Promise<UploadResult[]> {
+  // @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('files', 10, { storage: multer.memoryStorage() }),
+  )
+  async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {
-      throw new BadRequestException('فایل دریافت نشد ❌');
+      throw new BadRequestException('هیچ فایلی دریافت نشد ❌');
     }
 
-    const uploadResults: UploadResult[] = [];
+    const uploadResults: Array<{
+      message: string;
+      filePath: string;
+      hash: string;
+      duplicate: boolean;
+      success: boolean;
+    }> = [];
 
     for (const file of files) {
-      if (!file || !file.buffer) {
-        throw new BadRequestException('حداقل یکی از فایل‌ها معتبر نیست ❌');
-      }
+      const fileHash = crypto
+        .createHash('sha256')
+        .update(file.buffer)
+        .digest('hex');
 
-      const fileHash = crypto.createHash('sha256').update(file.buffer).digest('hex');
       const existing = await this.prisma.image.findUnique({
         where: { hash: fileHash },
       });
@@ -58,7 +58,7 @@ export class UploadsController {
         continue;
       }
 
-      const uploadResult = await this.uploadToCloudinary(file.buffer, file.originalname);
+      const uploadResult = await this.uploadToCloudinary(file.buffer, fileHash);
 
       const newImage = await this.prisma.image.create({
         data: {
@@ -81,19 +81,20 @@ export class UploadsController {
 
   private async uploadToCloudinary(
     fileBuffer: Buffer,
-    originalname: string,
+    fileHash: string,
   ): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
           folder: 'my-uploads',
           resource_type: 'image',
-          public_id: path.parse(originalname).name + '-' + Date.now(),
+          public_id: fileHash,
           allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
         },
         (error, result) => {
           if (error) return reject(error);
-          if (!result) return reject(new Error('Cloudinary result is undefined'));
+          if (!result)
+            return reject(new Error('Cloudinary result is undefined'));
           resolve(result);
         },
       );
