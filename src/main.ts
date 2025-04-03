@@ -21,7 +21,10 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(cookieParser());
   app.enableCors({
-    origin: '*',
+    origin: [
+      'http://localhost:3000',
+      'https://portfolio-site-rust-iota.vercel.app',
+    ],
     credentials: true,
   });
   await app.listen(process.env.PORT || 3000);
