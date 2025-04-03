@@ -13,10 +13,13 @@ export class GalleryController {
     return this.galleryService.addImagesBulk(body.portfolioId, body.images);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'حذف یک تصویر گالری' })
-  async deleteImage(@Param('id') id: string) {
-    return this.galleryService.deleteImage(+id);
+  @Delete(':portfolioId/:imageId')
+  @ApiOperation({ summary: 'حذف یک تصویر گالری از پروژه مشخص' })
+  async deleteImageFromPortfolio(
+    @Param('portfolioId') portfolioId: string,
+    @Param('imageId') imageId: string,
+  ) {
+    return this.galleryService.deleteImageFromPortfolio(+portfolioId, +imageId);
   }
 
   @Get('/portfolio/:portfolioId')
