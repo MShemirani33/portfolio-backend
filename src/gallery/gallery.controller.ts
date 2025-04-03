@@ -8,9 +8,9 @@ export class GalleryController {
   constructor(private readonly galleryService: GalleryService) {}
 
   @Post()
-  @ApiOperation({ summary: 'افزودن تصویر به گالری' })
-  async addImage(@Body() body: { portfolioId: number; imageUrl: string }) {
-    return this.galleryService.addImage(body.portfolioId, body.imageUrl);
+  @ApiOperation({ summary: 'افزودن چند تصویر به گالری' })
+  async addImagesBulk(@Body() body: { portfolioId: number; images: string[] }) {
+    return this.galleryService.addImagesBulk(body.portfolioId, body.images);
   }
 
   @Delete(':id')

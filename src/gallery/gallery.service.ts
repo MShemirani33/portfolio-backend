@@ -6,12 +6,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class GalleryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async addImage(portfolioId: number, imageUrl: string) {
-    return this.prisma.galleryImage.create({
-      data: {
-        portfolioId,
-        imageUrl,
-      },
+  async addImagesBulk(portfolioId: number, images: string[]) {
+    const data = images.map((url) => ({
+      imageUrl: url,
+      portfolioId,
+    }));
+    return this.prisma.galleryImage.createMany({
+      data,
     });
   }
 
