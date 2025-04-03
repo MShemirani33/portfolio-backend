@@ -8,18 +8,16 @@ export class PortfolioService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreatePortfolioDto) {
+    console.log('📦 dto received in create():', dto);
     return this.prisma.portfolio.create({
       data: {
         title: dto.title,
         slug: dto.slug,
-        thumbnail: dto.thumbnail,
+        thumbnail: dto.thumbnail, 
         shortDesc: dto.shortDesc,
         content: dto.content,
         gallery: {
-          create:
-            dto.galleryImages?.map((url) => ({
-              imageUrl: url,
-            })) || [],
+          create: dto.galleryImages?.map((url) => ({ imageUrl: url })) || [],
         },
       },
       include: {
