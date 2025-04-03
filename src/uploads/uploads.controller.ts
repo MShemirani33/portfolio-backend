@@ -3,78 +3,98 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { cloudinary } from 'src/utils/cloudinary.config';
-import * as path from 'path';
+import * as multer from 'multer';
 import * as crypto from 'crypto';
+import * as path from 'path';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { PrismaService } from 'src/prisma/prisma.service';
-
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: <any>{
-    folder: 'my-uploads',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    public_id: (req, file) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      return path.parse(file.originalname).name + '-' + uniqueSuffix;
-    },
-  },
-});
+import { Readable } from 'stream';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('upload')
 export class UploadsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Post('image')
-  @UseInterceptors(FileInterceptor('file', { storage }))
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    try {
-      if (!file || !file.buffer) {
-        return { message: '❌ فایل دریافت نشد', success: false };
-      }
+    if (!file || !file.buffer) {
+      throw new BadRequestException('فایل دریافت نشد ❌');
+    }
 
-      const fileHash = crypto
-        .createHash('sha256')
-        .update(file.buffer)
-        .digest('hex');
+    // 1. هش کردن تصویر
+    const fileHash = crypto
+      .createHash('sha256')
+      .update(file.buffer)
+      .digest('hex');
 
-      const existing = await this.prisma.image.findUnique({
-        where: { hash: fileHash },
-      });
+    // 2. بررسی وجود تصویر تکراری
+    const existing = await this.prisma.image.findUnique({
+      where: { hash: fileHash },
+    });
 
-      if (existing) {
-        return {
-          message: '✅ فایل تکراری بود، آدرس قبلی برگشت داده شد',
-          filePath: existing.url,
-          hash: existing.hash,
-          duplicate: true,
-          success: true,
-        };
-      }
-
-      const newImage = await this.prisma.image.create({
-        data: {
-          url: file.path,
-          hash: fileHash,
-        },
-      });
-
+    if (existing) {
       return {
-        message: '✅ آپلود موفق',
-        filePath: newImage.url,
-        hash: newImage.hash,
-        duplicate: false,
+        message: '✅ تصویر تکراری بود - آدرس قبلی برگشت داده شد',
+        filePath: existing.url,
+        hash: existing.hash,
+        duplicate: true,
         success: true,
       };
-    } catch (error) {
-      console.error('❌ ارور دقیق:', error); // مهم‌ترین بخش
-      return {
-        statusCode: 500,
-        message: '❌ خطا در سرور',
-        error: error.message || error,
-      };
     }
+
+    // 3. آپلود به Cloudinary
+    const uploadResult = await this.uploadToCloudinary(
+      file.buffer,
+      file.originalname,
+    );
+
+    // 4. ذخیره در دیتابیس
+    const newImage = await this.prisma.image.create({
+      data: {
+        url: uploadResult.secure_url,
+        hash: fileHash,
+      },
+    });
+
+    return {
+      message: '✅ آپلود موفق',
+      filePath: newImage.url,
+      hash: newImage.hash,
+      duplicate: false,
+      success: true,
+    };
+  }
+
+  private async uploadToCloudinary(
+    fileBuffer: Buffer,
+    originalname: string,
+  ): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'my-uploads',
+          resource_type: 'image',
+          public_id: path.parse(originalname).name + '-' + Date.now(),
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          if (!result)
+            return reject(new Error('Cloudinary result is undefined'));
+          resolve(result);
+        },
+      );
+
+      const readable = new Readable();
+      readable.push(fileBuffer);
+      readable.push(null);
+      readable.pipe(stream);
+    });
   }
 }
