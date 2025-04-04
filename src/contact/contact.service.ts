@@ -16,6 +16,7 @@ export class ContactService {
     });
   }
 
+
   async findAll() {
     return this.prisma.contactMessage.findMany({
       orderBy: { createdAt: 'desc' },

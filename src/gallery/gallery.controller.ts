@@ -1,4 +1,12 @@
-import { Controller, Post, Delete, Get, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Delete,
+  Get,
+  Patch,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { GalleryService } from './gallery.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
@@ -11,6 +19,15 @@ export class GalleryController {
   @ApiOperation({ summary: 'افزودن چند تصویر به گالری' })
   async addImagesBulk(@Body() body: { portfolioId: number; images: string[] }) {
     return this.galleryService.addImagesBulk(body.portfolioId, body.images);
+  }
+
+  @Patch(':portfolioId')
+  @ApiOperation({ summary: 'ویرایش کامل گالری پروژه' })
+  async updateGallery(
+    @Param('portfolioId') portfolioId: string,
+    @Body() body: { images: string[] },
+  ) {
+    return this.galleryService.updateGallery(+portfolioId, body.images);
   }
 
   @Delete(':portfolioId/:imageId')

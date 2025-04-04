@@ -9,18 +9,15 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import * as crypto from 'crypto';
-import * as path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Readable } from 'stream';
-// import { AuthGuard } from '@nestjs/passport';
 
 @Controller('upload')
 export class UploadsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Post('images')
-  // @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FilesInterceptor('files', 10, { storage: multer.memoryStorage() }),
   )
