@@ -24,14 +24,13 @@ export class AuthController {
   ) {
     const { token } = await this.authService.login(dto);
 
-    const isProd = process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
 
     res.cookie('admin_token', token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
+      httpOnly: true, 
+      sameSite:  'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      path: '/', 
     });
 
     return { message: 'ورود موفقیت‌آمیز بود ✅' };
