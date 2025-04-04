@@ -9,14 +9,12 @@ import {
 } from '@nestjs/common';
 import { HomePageContentService } from './home-page-content.service';
 import { CreateContentDto } from './create-content.dto';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('home-content')
 export class HomePageContentController {
   constructor(private readonly contentService: HomePageContentService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
   upsert(@Body() dto: CreateContentDto) {
     return this.contentService.upsert(dto);
   }
@@ -32,7 +30,6 @@ export class HomePageContentController {
   }
 
   @Delete(':key')
-  @UseGuards(AuthGuard('jwt'))
   delete(@Param('key') key: string) {
     return this.contentService.delete(key);
   }
