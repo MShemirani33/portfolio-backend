@@ -27,7 +27,14 @@ export class GalleryController {
     @Param('portfolioId') portfolioId: string,
     @Body() body: { images: string[] },
   ) {
-    return this.galleryService.updateGallery(+portfolioId, body.images);
+    const updatedGallery = await this.galleryService.updateGallery(
+      +portfolioId,
+      body.images,
+    );
+    return {
+      message: 'گالری با موفقیت بروزرسانی شد',
+      updatedImages: updatedGallery,
+    };
   }
 
   @Delete(':portfolioId/:imageId')
