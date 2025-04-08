@@ -21,7 +21,11 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(cookieParser());
   app.enableCors({
-    origin: 'https://portfolio-site-rust-iota.vercel.app',
+    origin: [
+      'http://localhost:3000',
+      'https://portfolio-site-rust-iota.vercel.app',
+      'https://melikashemirani.ir',
+    ],
     credentials: true,
   });
   await app.listen(process.env.PORT || 3000);
