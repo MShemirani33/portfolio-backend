@@ -12,7 +12,7 @@ async function bootstrap() {
     .setTitle('API Documentation')
     .setDescription('مستندات REST API پروژه')
     .setVersion('1.0')
-    .addBearerAuth() // اگر نیاز به احراز هویت داری
+    .addBearerAuth() 
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -27,13 +27,7 @@ async function bootstrap() {
     ],
     credentials: true,
   });
-  const distPath = path.join(__dirname);
-try {
-  fs.rmdirSync(distPath, { recursive: true });
-  console.log('❌ dist پاک شد'); // این باید خطا بده!
-} catch (err) {
-  console.error('🚨 تست دسترسی به dist:', err.message);
-}
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
