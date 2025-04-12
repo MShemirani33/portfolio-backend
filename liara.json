@@ -1,8 +1,8 @@
 {
-"app":"apishemirani"
-"port":3000
-"build":{
-"location":"iran"
-}
-"disks":[]
+  "app": "apishemirani",
+  "port": 3000,
+  "build": {
+    "location": "iran"
+  },
+  "disks": []
 }
