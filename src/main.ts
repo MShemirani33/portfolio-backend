@@ -18,7 +18,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.use(cookieParser());
   app.enableCors({
     origin: [
