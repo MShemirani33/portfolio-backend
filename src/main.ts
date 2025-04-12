@@ -27,6 +27,13 @@ async function bootstrap() {
     ],
     credentials: true,
   });
+  const distPath = path.join(__dirname);
+try {
+  fs.rmdirSync(distPath, { recursive: true });
+  console.log('❌ dist پاک شد'); // این باید خطا بده!
+} catch (err) {
+  console.error('🚨 تست دسترسی به dist:', err.message);
+}
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
