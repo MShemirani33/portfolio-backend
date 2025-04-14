@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "prisma generate",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main.js",
@@ -73,9 +72,6 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.20.0"
-  },
-   "prisma": {
-   "schema": "./prisma/schema.prisma"
   },
   "jest": {
     "moduleFileExtensions": [
